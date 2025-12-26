@@ -7,33 +7,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "cars")
+@Table(name = "deficiencies")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Car {
+public class Deficiency {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String licensePlate;
+    @Column(nullable = false, length = 500)
+    private String description;
 
     @Column(nullable = false)
-    private String brand;
+    private Double estimatedCost;
 
     @Column(nullable = false)
-    private String model;
-
-    @Column(nullable = false)
-    private Integer year;
+    private Boolean safetyRisk;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
-
-    @OneToOne(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
-    private CarPapers carPapers;
+    @JoinColumn(name = "inspection_id", nullable = false)
+    private Inspection inspection;
 }
