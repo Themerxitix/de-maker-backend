@@ -1,39 +1,53 @@
-# De-maker-backend
+# De Maker - Autogarage API
 
-## Test Credentials
-| Username | Email | Password | Role |
-|----------|-------|----------|------|
-| admin | admin@demaker.nl | password123 | ADMIN + MONTEUR |
-| monteur1 | monteur@demaker.nl | password123 | MONTEUR |
+REST API voor autogarage "De Maker" -
 
-## Test Endpoints
+## Tech Stack
 
-### 1. Login
-```bash
-POST http://localhost:8080/api/auth/login
-Content-Type: application/json
+Java 17 | Spring Boot 3.x | Spring Security (JWT) | PostgreSQL | Maven
 
-{
-  "usernameOrEmail": "admin",
-  "password": "password123"
-}
+## Installatie
+
+### Vereisten
+- Java 17+
+- PostgreSQL 14+ (moet draaien)
+- IntelliJ IDEA (aanbevolen)
+
+### 1. Database Setup (Eerst!)
+```sql
+CREATE DATABASE garage_db;
+CREATE USER garage_user WITH PASSWORD '';
+GRANT ALL PRIVILEGES ON DATABASE garage_db TO garage_user;
 ```
 
-Response:
-```json
-{
-  "accessToken": "eyJhbGc...",
-  "tokenType": "Bearer"
-}
+### 2. Project Starten
+```bash
+git clone https://github.com/Themerxitix/de-maker-backend.git
 ```
 
-### 2. Register
-```bash
-POST http://localhost:8080/api/auth/register
-Content-Type: application/json
+**Open in IntelliJ → Klik op groene ▶ knop rechtsboven**
 
-{
-  "username": "newuser",
-  "email": "new@demaker.nl",
-  "password": "password123"
-}
+API draait op: `http://localhost:8080`
+
+## Authenticatie
+
+De API gebruikt JWT tokens voor beveiliging. Twee gebruikersrollen:
+| Rol     | Username   | Password    |
+|---------|------------|-------------|
+| Admin   | `admin`    | `admin123`  |
+| Monteur | `monteur1` | `monteur123`|
+
+**Test credentials:** Zie Installatiehandleiding voor inloggegevens.
+
+## Testen
+
+**IntelliJ:** Rechtermuis op `test` folder → Run Tests
+- 21 unit tests
+- 100% line coverage op 2 service classes
+
+**Postman:** Importeer `Demaker-API.postman_collection.json` voor API tests
+
+
+---
+
+**GitHub:** [github.com/Themerxitix/de-maker-backend](https://github.com/Themerxitix/de-maker-backend)
