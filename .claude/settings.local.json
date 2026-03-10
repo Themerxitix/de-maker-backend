@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(del \"C:\\\\Users\\\\Gebruiker\\\\Backend\\\\Eindopdracht_Backend_Albor_Metaliaj\\\\Eindopdracht_Backend_Albor_Metaliaj\\\\de-maker-backend\\\\src\\\\main\\\\resources\\\\data.sql\")"
+    ]
+  }
+}
