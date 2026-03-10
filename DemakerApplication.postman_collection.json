@@ -1,127 +1,808 @@
 {
 	"info": {
 		"_postman_id": "3a7fdb43-ae0e-4a94-938b-c0460c295bea",
-		"name": "DemakerApplication",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "42726443"
+		"name": "DeMaker Autogarage API",
+		"description": "Complete API collectie voor DeMaker Autogarage Backend - HBO Eindopdracht\n\nGebruik:\n1. Start de applicatie met 'mvn spring-boot:run'\n2. Run deze collectie in volgorde\n3. Login request slaat automatisch de token op",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "POST LoginEndpoint",
-			"event": [
+			"name": "1. Auth",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"// Test 1: Check status code\r",
-							"pm.test(\"Login successful\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});\r",
-							"\r",
-							"// Test 2: Check response has token\r",
-							"pm.test(\"Response has accessToken\", function () {\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData).to.have.property('accessToken');\r",
-							"});\r",
-							"\r",
-							"// Auto-save token to collection variable\r",
-							"if (pm.response.code === 200) {\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.collectionVariables.set(\"authToken\", jsonData.accessToken);\r",
-							"    console.log(\"Token saved:\", jsonData.accessToken);\r",
-							"}"
+					"name": "POST Register nieuwe gebruiker",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Success message returned\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"registered\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"usernameOrEmail\": \"admin\",\r\n  \"password\": \"admin123\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"testuser@demaker.nl\",\n    \"password\": \"test123456\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/register",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "auth", "register"]
 						}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:8080/api/auth/login",
-					"protocol": "http",
-					"host": [
-						"localhost"
+				{
+					"name": "POST Login (admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login successful - Status 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has accessToken\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('accessToken');",
+									"});",
+									"",
+									"// Automatisch token opslaan in collection variable",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"authToken\", jsonData.accessToken);",
+									"    console.log(\"Token opgeslagen!\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
 					],
-					"port": "8080",
-					"path": [
-						"api",
-						"auth",
-						"login"
-					]
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"usernameOrEmail\": \"admin\",\n    \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/login",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "auth", "login"]
+						}
+					}
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "http://localhost:8080/api/customers",
-			"event": [
+			"name": "2. Customers",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"// Test 1: Status is 200\r",
-							"pm.test(\"Get customers successful\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});\r",
-							"\r",
-							"// Test 2: Response is array\r",
-							"pm.test(\"Response is array\", function () {\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData).to.be.an('array');\r",
-							"});\r",
-							"\r",
-							"// Test 3: Array has test data\r",
-							"pm.test(\"Has at least 1 customer\", function () {\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData.length).to.be.at.least(1);\r",
-							"});"
+					"name": "GET Alle klanten",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is array\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Minimaal 2 klanten uit data.sql\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.be.at.least(2);",
+									"});",
+									"",
+									"// Sla eerste klant ID op voor volgende requests",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.length > 0) {",
+									"        pm.collectionVariables.set(\"customerId\", jsonData[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{"key": "token", "value": "{{authToken}}", "type": "string"}]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/customers",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "customers"]
+						}
+					}
+				},
+				{
+					"name": "GET Klant op ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Klant heeft juiste velden\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('firstName');",
+									"    pm.expect(jsonData).to.have.property('lastName');",
+									"    pm.expect(jsonData).to.have.property('email');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{"key": "token", "value": "{{authToken}}", "type": "string"}]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/customers/{{customerId}}",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "customers", "{{customerId}}"]
+						}
+					}
+				},
+				{
+					"name": "POST Nieuwe klant aanmaken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Nieuwe klant heeft ID\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData.firstName).to.equal('Test');",
+									"});",
+									"",
+									"// Sla nieuwe klant ID op",
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"newCustomerId\", jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{"key": "token", "value": "{{authToken}}", "type": "string"}]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Test\",\n    \"lastName\": \"Klant\",\n    \"email\": \"test.klant@email.nl\",\n    \"phoneNumber\": \"0612121212\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/customers",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "customers"]
+						}
+					}
+				},
+				{
+					"name": "PUT Klant bijwerken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Klant is bijgewerkt\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.firstName).to.equal('TestUpdate');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{"key": "token", "value": "{{authToken}}", "type": "string"}]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"TestUpdate\",\n    \"lastName\": \"KlantUpdate\",\n    \"email\": \"test.update@email.nl\",\n    \"phoneNumber\": \"0698989898\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/customers/{{newCustomerId}}",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "customers", "{{newCustomerId}}"]
+						}
 					}
 				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
+			]
+		},
+		{
+			"name": "3. Cars",
+			"item": [
+				{
+					"name": "GET Alle auto's",
+					"event": [
 						{
-							"key": "token",
-							"value": "{{authToken}}",
-							"type": "string"
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is array\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Minimaal 3 auto's uit data.sql\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.be.at.least(3);",
+									"});",
+									"",
+									"// Sla eerste auto ID op",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.length > 0) {",
+									"        pm.collectionVariables.set(\"carId\", jsonData[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
 						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/api/customers",
-					"protocol": "http",
-					"host": [
-						"localhost"
 					],
-					"port": "8080",
-					"path": [
-						"api",
-						"customers"
-					]
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{"key": "token", "value": "{{authToken}}", "type": "string"}]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/cars",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "cars"]
+						}
+					}
+				},
+				{
+					"name": "GET Auto op ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Auto heeft juiste velden\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('licensePlate');",
+									"    pm.expect(jsonData).to.have.property('brand');",
+									"    pm.expect(jsonData).to.have.property('model');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{"key": "token", "value": "{{authToken}}", "type": "string"}]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/cars/{{carId}}",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "cars", "{{carId}}"]
+						}
+					}
+				},
+				{
+					"name": "POST Nieuwe auto aanmaken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Nieuwe auto heeft ID\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData.brand).to.equal('Tesla');",
+									"});",
+									"",
+									"// Sla nieuwe auto ID op voor papers upload",
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"newCarId\", jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{"key": "token", "value": "{{authToken}}", "type": "string"}]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"licensePlate\": \"XX-999-YY\",\n    \"brand\": \"Tesla\",\n    \"model\": \"Model 3\",\n    \"year\": 2023,\n    \"customerId\": {{customerId}}\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/cars",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "cars"]
+						}
+					}
+				},
+				{
+					"name": "POST Upload kentekenbewijs (PDF)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response bevat bestandsnaam\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('fileName');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{"key": "token", "value": "{{authToken}}", "type": "string"}]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": ""
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/cars/{{newCarId}}/papers",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "cars", "{{newCarId}}", "papers"]
+						}
+					}
+				},
+				{
+					"name": "GET Download kentekenbewijs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is PDF\", function () {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{"key": "token", "value": "{{authToken}}", "type": "string"}]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/cars/{{newCarId}}/papers/download",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "cars", "{{newCarId}}", "papers", "download"]
+						}
+					}
 				}
-			},
-			"response": []
+			]
+		},
+		{
+			"name": "4. Inspections",
+			"item": [
+				{
+					"name": "GET Alle keuringen",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is array\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Minimaal 2 keuringen uit data.sql\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.be.at.least(2);",
+									"});",
+									"",
+									"// Sla eerste keuring ID op",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.length > 0) {",
+									"        pm.collectionVariables.set(\"inspectionId\", jsonData[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{"key": "token", "value": "{{authToken}}", "type": "string"}]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/inspections",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "inspections"]
+						}
+					}
+				},
+				{
+					"name": "GET Keuring op ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Keuring heeft juiste velden\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('plannedDate');",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{"key": "token", "value": "{{authToken}}", "type": "string"}]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/inspections/{{inspectionId}}",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "inspections", "{{inspectionId}}"]
+						}
+					}
+				},
+				{
+					"name": "POST Nieuwe keuring aanmaken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Nieuwe keuring heeft ID\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData.status).to.equal('PLANNED');",
+									"});",
+									"",
+									"// Sla nieuwe keuring ID op",
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"newInspectionId\", jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{"key": "token", "value": "{{authToken}}", "type": "string"}]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"carId\": {{carId}},\n    \"plannedDate\": \"2024-06-01\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/inspections",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "inspections"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Deficiencies",
+			"item": [
+				{
+					"name": "GET Alle tekortkomingen",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is array\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Minimaal 3 tekortkomingen uit data.sql\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.be.at.least(3);",
+									"});",
+									"",
+									"// Sla eerste tekortkoming ID op",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.length > 0) {",
+									"        pm.collectionVariables.set(\"deficiencyId\", jsonData[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{"key": "token", "value": "{{authToken}}", "type": "string"}]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/deficiencies",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "deficiencies"]
+						}
+					}
+				},
+				{
+					"name": "GET Tekortkoming op ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Tekortkoming heeft juiste velden\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('description');",
+									"    pm.expect(jsonData).to.have.property('estimatedCost');",
+									"    pm.expect(jsonData).to.have.property('safetyRisk');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{"key": "token", "value": "{{authToken}}", "type": "string"}]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/deficiencies/{{deficiencyId}}",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "deficiencies", "{{deficiencyId}}"]
+						}
+					}
+				},
+				{
+					"name": "POST Nieuwe tekortkoming aanmaken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Nieuwe tekortkoming heeft ID\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData.description).to.equal('Koplamp defect');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{"key": "token", "value": "{{authToken}}", "type": "string"}]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inspectionId\": {{inspectionId}},\n    \"description\": \"Koplamp defect\",\n    \"estimatedCost\": 75.00,\n    \"safetyRisk\": true\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/deficiencies",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "deficiencies"]
+						}
+					}
+				}
+			]
 		}
 	],
 	"auth": {
@@ -139,29 +820,57 @@
 			"listen": "prerequest",
 			"script": {
 				"type": "text/javascript",
-				"packages": {},
-				"requests": {},
-				"exec": [
-					""
-				]
+				"exec": [""]
 			}
 		},
 		{
 			"listen": "test",
 			"script": {
 				"type": "text/javascript",
-				"packages": {},
-				"requests": {},
-				"exec": [
-					""
-				]
+				"exec": [""]
 			}
 		}
 	],
 	"variable": [
 		{
 			"key": "authToken",
-			"value": ""
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "customerId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "newCustomerId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "carId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "newCarId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "inspectionId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "newInspectionId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "deficiencyId",
+			"value": "",
+			"type": "string"
 		}
 	]
 }
