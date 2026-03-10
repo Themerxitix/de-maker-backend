@@ -10,15 +10,20 @@ INSERT INTO roles (name) VALUES ('ROLE_MONTEUR') ON CONFLICT (name) DO NOTHING;
 -- =====================================================================
 -- test users: admin en monteur
 -- Je kunt inloggen met: admin / admin123 of monteur / admin123
--- BCrypt hash: $2a$10$... is een gehashed wachtwoord
 -- =====================================================================
+-- Admin gebruiker toevoegen (alleen als username EN email nog niet bestaan)
 INSERT INTO users (username, email, password)
-VALUES ('admin', 'admin@demaker.nl', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZagcFl7p1xMh8qw/Z1AOZvMUMCxYu')
-ON CONFLICT (username) DO NOTHING;
+SELECT 'admin', 'admin@demaker.nl', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZagcFl7p1xMh8qw/Z1AOZvMUMCxYu'
+    WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE username = 'admin' OR email = 'admin@demaker.nl'
+);
 
+-- Monteur gebruiker toevoegen (alleen als username EN email nog niet bestaan)
 INSERT INTO users (username, email, password)
-VALUES ('monteur', 'monteur@demaker.nl', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZagcFl7p1xMh8qw/Z1AOZvMUMCxYu')
-ON CONFLICT (username) DO NOTHING;
+SELECT 'monteur', 'monteur@demaker.nl', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZagcFl7p1xMh8qw/Z1AOZvMUMCxYu'
+    WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE username = 'monteur' OR email = 'monteur@demaker.nl'
+);
 
 
 -- =====================================================================
@@ -54,7 +59,6 @@ ON CONFLICT (email) DO NOTHING;
 INSERT INTO customers (first_name, last_name, email, phone_number)
 VALUES ('Pieter', 'Bakker', 'pieter.bakker@email.nl', '0611223344')
 ON CONFLICT (email) DO NOTHING;
-
 
 -- =====================================================================
 -- Elke auto is gekoppeld aan een klant via customer_id
@@ -175,8 +179,3 @@ AND NOT EXISTS (
 );
 
 
--- =====================================================================
--- Login credentials:
---   Username: admin    Wachtwoord: admin123
---   Username: monteur  Wachtwoord: admin123
--- =====================================================================
