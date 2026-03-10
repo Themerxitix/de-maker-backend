@@ -37,7 +37,7 @@ public class DataInitializer implements CommandLineRunner {
 
             // 2. Initialize test users
             initializeUser("admin", "admin@demaker.nl", "admin123", Set.of(adminRole, monteurRole));
-            initializeUser("monteur1", "monteur@demaker.nl", "monteur123", Set.of(monteurRole));
+            initializeUser("monteur", "monteur@demaker.nl", "monteur123", Set.of(monteurRole));
 
             System.out.println("\n=== Test Credentials ===");
             System.out.println("Admin:   username=admin,    password=admin123");
