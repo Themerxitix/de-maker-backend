@@ -1,35 +1,21 @@
 
--- =====================================================================
---  ADMIN (kan alles) en MONTEUR (beperkte rechten)
--- "ON CONFLICT DO NOTHING" zorgt ervoor dat als de rol al bestaat,
--- =====================================================================
 INSERT INTO roles (name) VALUES ('ROLE_ADMIN') ON CONFLICT (name) DO NOTHING;
 INSERT INTO roles (name) VALUES ('ROLE_MONTEUR') ON CONFLICT (name) DO NOTHING;
 
 
--- =====================================================================
--- test users: admin en monteur
--- Je kunt inloggen met: admin / admin123 of monteur / admin123
--- =====================================================================
--- Admin gebruiker toevoegen (alleen als username EN email nog niet bestaan)
 INSERT INTO users (username, email, password)
-SELECT 'admin', 'admin@demaker.nl', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZagcFl7p1xMh8qw/Z1AOZvMUMCxYu'
+SELECT 'admin', 'admin@demaker.nl', '$2a$10$19SY3jikPxftRM6MoJ7ZSO9IIxO7DVyrDSUwq0PnetYmrpsdKhdzC'
     WHERE NOT EXISTS (
     SELECT 1 FROM users WHERE username = 'admin' OR email = 'admin@demaker.nl'
 );
 
 -- Monteur gebruiker toevoegen (alleen als username EN email nog niet bestaan)
 INSERT INTO users (username, email, password)
-SELECT 'monteur', 'monteur@demaker.nl', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZagcFl7p1xMh8qw/Z1AOZvMUMCxYu'
+SELECT 'monteur', 'monteur@demaker.nl', '$2a$10$19SY3jikPxftRM6MoJ7ZSO9IIxO7DVyrDSUwq0PnetYmrpsdKhdzC'
     WHERE NOT EXISTS (
     SELECT 1 FROM users WHERE username = 'monteur' OR email = 'monteur@demaker.nl'
 );
 
-
--- =====================================================================
--- Dit is een many-to-many relatie: 1 user kan meerdere rollen hebben
--- We gebruiken een subquery om de juiste IDs op te halen
--- =====================================================================
 
 -- Admin krijgt de ROLE_ADMIN rol
 INSERT INTO user_roles (user_id, role_id)
@@ -44,10 +30,6 @@ WHERE u.username = 'monteur' AND r.name = 'ROLE_MONTEUR'
 ON CONFLICT DO NOTHING;
 
 
--- =====================================================================
--- Dit zijn gewoon klanten
--- Telefoon  nummers zijn in NL formaat (06-xxxxxxxx)
--- =====================================================================
 INSERT INTO customers (first_name, last_name, email, phone_number)
 VALUES ('Jan', 'de Vries', 'jan.devries@email.nl', '0612345678')
 ON CONFLICT (email) DO NOTHING;
@@ -59,12 +41,6 @@ ON CONFLICT (email) DO NOTHING;
 INSERT INTO customers (first_name, last_name, email, phone_number)
 VALUES ('Pieter', 'Bakker', 'pieter.bakker@email.nl', '0611223344')
 ON CONFLICT (email) DO NOTHING;
-
--- =====================================================================
--- Elke auto is gekoppeld aan een klant via customer_id
--- Gebruiken een subquery om de klant ID op te halen via email
--- Kentekens zijn in NL formaat (XX-123-YY)
--- =====================================================================
 
 -- Auto 1: Volkswagen Golf van Jan de Vries
 INSERT INTO cars (license_plate, brand, model, year, customer_id)
@@ -89,12 +65,6 @@ INSERT INTO cars (license_plate, brand, model, year, customer_id)
 SELECT 'MN-012-OP', 'Audi', 'A4', 2018, c.id
 FROM customers c WHERE c.email = 'jan.devries@email.nl'
 ON CONFLICT (license_plate) DO NOTHING;
-
-
--- =====================================================================
--- Status kan zijn: PLANNED, IN_PROGRESS, COMPLETED, CANCELLED
--- Koppelen aan auto via car_id
--- =====================================================================
 
 -- Keuring 1: Afgeronde keuring voor de Volkswagen Golf
 INSERT INTO inspections (planned_date, status, car_id)
@@ -122,17 +92,6 @@ AND NOT EXISTS (
     SELECT 1 FROM inspections i
     WHERE i.car_id = c.id AND i.planned_date = '2024-04-01'
 );
-
-
--- =====================================================================
--- TEKORTKOMINGEN/DEFICIENCIES AANMAKEN
--- Dit zijn problemen die gevonden zijn tijdens een keuring
--- Elke tekortkoming heeft:
---   - description: wat is er mis
---   - estimated_cost: geschatte reparatiekosten
---   - safety_risk: is het gevaarlijk? (true/false)
---   - inspection_id: bij welke keuring hoort dit
--- =====================================================================
 
 -- Tekortkoming 1: Versleten remblokken (gevaarlijk!)
 INSERT INTO deficiencies (description, estimated_cost, safety_risk, inspection_id)
