@@ -6,46 +6,49 @@ REST API voor autogarage "De Maker" -
 
 Java 17 | Spring Boot 3.x | Spring Security (JWT) | PostgreSQL | Maven
 
-## Installatie
-
 ### Vereisten
 - Java 17+
-- PostgreSQL 14+ (moet draaien)
-- IntelliJ IDEA (aanbevolen)
+- PostgreSQL 14+ 
+- IntelliJ IDEA 
+- 
+## Installatie
 
-### 1. Database Setup (Eerst!)
+### 1. Clone de repository:
+git clone https://github.com/Themerxitix/de-maker-backend
+
+### 2. Database Setup 
 ```sql
-CREATE DATABASE garage_db;
-CREATE USER garage_user WITH PASSWORD '';
-GRANT ALL PRIVILEGES ON DATABASE garage_db TO garage_user;
+CREATE DATABASE demaker;
 ```
 
-### 2. Project Starten
-```bash
-git clone https://github.com/Themerxitix/de-maker-backend.git
+### 3. Project Starten
+```src/main/resources/application.properties 
+spring.datasource.url=jdbc:postgresql://localhost:5433/demaker
+spring.datasource.username=jouw_gebruikersnaam
+spring.datasource.password=jouw_wachtwoord
 ```
+### 4. Project Starten
 
-**Open in IntelliJ → Klik op groene ▶ knop rechtsboven**
+mvn spring-boot:run
+
+of
+
+**Open in IntelliJ → Klik op groene**
 
 API draait op: `http://localhost:8080`
-
+ 
 ## Authenticatie
 
-De API gebruikt JWT tokens voor beveiliging. Twee gebruikersrollen:
 | Rol     | Username   | Password    |
 |---------|------------|-------------|
 | Admin   | `admin`    | `admin123`  |
-| Monteur | `monteur1` | `monteur123`|
+| Monteur | `monteur` | `admin123`|
 
 **Test credentials:** Zie Installatiehandleiding voor inloggegevens.
 
 ## Testen
 
-**IntelliJ:** Rechtermuis op `test` folder → Run Tests
-- 21 unit tests
-- 100% line coverage op 2 service classes
-
-**Postman:** Importeer `Demaker-API.postman_collection.json` voor API tests
+DeMaker Autogarage API.postman_collection_V5.json
 
 
 ---
