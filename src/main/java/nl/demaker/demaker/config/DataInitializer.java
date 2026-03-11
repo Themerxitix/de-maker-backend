@@ -53,11 +53,6 @@ import java.util.Set;
 @Component  // <-- Dit zorgt dat Spring deze class automatisch aanmaakt
 public class DataInitializer implements CommandLineRunner {
 
-    // ========================================================================
-    // STAP 1: REPOSITORIES DECLAREREN
-    // Dit zijn de "verbindingen" naar je database tabellen
-    // Met een repository kun je data opslaan, ophalen, updaten en verwijderen
-    // ========================================================================
 
     private final RoleRepository roleRepository;           // Voor de 'roles' tabel
     private final UserRepository userRepository;           // Voor de 'users' tabel
@@ -67,10 +62,6 @@ public class DataInitializer implements CommandLineRunner {
     private final InspectionRepository inspectionRepository; // Voor de 'inspections' tabel
     private final DeficiencyRepository deficiencyRepository; // Voor de 'deficiencies' tabel
 
-    // ========================================================================
-    // CONSTRUCTOR - Spring injecteert hier automatisch alle repositories
-    // Dit heet "Dependency Injection" - Spring maakt de objecten voor je aan
-    // ========================================================================
     public DataInitializer(RoleRepository roleRepository,
                           UserRepository userRepository,
                           PasswordEncoder passwordEncoder,
@@ -88,10 +79,6 @@ public class DataInitializer implements CommandLineRunner {
         this.deficiencyRepository = deficiencyRepository;
     }
 
-    // ========================================================================
-    // RUN METHOD - Dit wordt automatisch aangeroepen bij het opstarten
-    // @Transactional = als er iets fout gaat, wordt alles teruggedraaid
-    // ========================================================================
     @Override
     @Transactional
     public void run(String... args) {
@@ -138,10 +125,6 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
-    // ========================================================================
-    // HELPER METHOD: Rol aanmaken
-    // Checkt eerst of de rol al bestaat, zo niet -> maak aan
-    // ========================================================================
     private Role initializeRole(String roleName) {
         // findByName() zoekt in de database naar een rol met deze naam
         // orElseGet() = als niet gevonden, voer dan de code in de lambda uit
@@ -156,10 +139,6 @@ public class DataInitializer implements CommandLineRunner {
                 });
     }
 
-    // ========================================================================
-    // HELPER METHOD: User aanmaken
-    // Checkt eerst of de user al bestaat, zo niet -> maak aan met gehashed wachtwoord
-    // ========================================================================
     private void initializeUser(String username, String email, String password, Set<Role> roles) {
         // Check of user al bestaat
         if (userRepository.findByUsername(username).isEmpty()) {
@@ -177,10 +156,6 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
-    // ========================================================================
-    // METHOD: Klanten aanmaken
-    // Maakt 3 test klanten aan met Nederlandse namen
-    // ========================================================================
     private void initializeCustomers() {
         // count() telt hoeveel records er in de tabel zitten
         // Als er 0 zijn, maken we nieuwe aan
@@ -216,11 +191,6 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
-    // ========================================================================
-    // METHOD: Auto's aanmaken
-    // Maakt 4 auto's aan en koppelt ze aan klanten
-    // BELANGRIJK: car.setCustomer(jan) maakt de FOREIGN KEY relatie!
-    // ========================================================================
     private void initializeCars() {
         if (carRepository.count() == 0) {
 
@@ -275,11 +245,6 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
-    // ========================================================================
-    // METHOD: Keuringen aanmaken
-    // Maakt 3 keuringen aan met verschillende statussen
-    // InspectionStatus is een ENUM (vaste waardes: PLANNED, IN_PROGRESS, COMPLETED, CANCELLED)
-    // ========================================================================
     private void initializeInspections() {
         if (inspectionRepository.count() == 0) {
 
@@ -318,11 +283,6 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
-    // ========================================================================
-    // METHOD: Tekortkomingen aanmaken
-    // Maakt 4 tekortkomingen aan bij de keuringen
-    // Elke tekortkoming heeft: beschrijving, kosten, en of het een veiligheidsrisico is
-    // ========================================================================
     private void initializeDeficiencies() {
         if (deficiencyRepository.count() == 0) {
 
