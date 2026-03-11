@@ -25,7 +25,6 @@ public class CarPapers {
     @Column(nullable = false)
     private LocalDate uploadDate;
 
-    @Lob
     @Column(nullable = false, columnDefinition = "BYTEA")
     private byte[] fileData;
 
