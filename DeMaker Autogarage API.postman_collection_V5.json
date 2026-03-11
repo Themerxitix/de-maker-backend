@@ -117,6 +117,66 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "POST Login (monteur)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Login successful - Status 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has accessToken\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('accessToken');",
+                  "});",
+                  "",
+                  "// Automatisch token opslaan in collection variable",
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set(\"monteurToken\", jsonData.accessToken);",
+                  "    console.log(\"Token opgeslagen!\");",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"usernameOrEmail\": \"monteur\",\n    \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -357,6 +417,39 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "DELETE klant",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Klant verwijderd - Status 204\", function () {\r",
+                  "    pm.response.to.have.status(204);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": []
+          },
+          "response": []
         }
       ]
     },
@@ -390,9 +483,14 @@
                   "    if (jsonData.length > 0) {",
                   "        pm.collectionVariables.set(\"carId\", jsonData[0].id);",
                   "    }",
-                  "}"
+                  "}",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"dataCarId\", jsonData[0].id);"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -541,6 +639,59 @@
           "response": []
         },
         {
+          "name": "Auto bijwerken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Auto bijgewerkt - Status 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"licensePlate\": \"ZZ-999-Z\",\r\n    \"brand\": \"Toyota\",\r\n    \"model\": \"Aygo Updated\",\r\n    \"year\": 2021,\r\n    \"customerId\": {{newCustomerId}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/cars/{{newCarId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "cars",
+                "{{newCarId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "POST Upload kentekenbewijs (PDF)",
           "event": [
             {
@@ -649,6 +800,95 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "DELETE Kentekenbewijs verwijderen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Kentekenbewijs verwijderd - Status 204\", function () { pm.response.to.have.status(204); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/cars/{{newCarId}}/papers",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "cars",
+                "{{newCarId}}",
+                "papers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Auto verwijderen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Auto verwijderd - Status 204\", function () { pm.response.to.have.status(204); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/cars/{{newCarId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "cars",
+                "{{newCarId}}"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -682,9 +922,14 @@
                   "    if (jsonData.length > 0) {",
                   "        pm.collectionVariables.set(\"inspectionId\", jsonData[0].id);",
                   "    }",
-                  "}"
+                  "}",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"dataInspectionId\", jsonData[0].id);"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -788,9 +1033,14 @@
                   "if (pm.response.code === 201) {",
                   "    var jsonData = pm.response.json();",
                   "    pm.collectionVariables.set(\"newInspectionId\", jsonData.id);",
-                  "}"
+                  "}",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"newInspectionId\", jsonData.id);"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -814,7 +1064,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"carId\": {{carId}},\n    \"plannedDate\": \"2024-06-01\"\n}"
+              "raw": "{\n    \"plannedDate\": \"2026-04-01\",\n    \"status\": \"IN_PROGRESS\",\n    \"carId\": {{dataCarId}}\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/inspections",
@@ -826,6 +1076,103 @@
               "path": [
                 "api",
                 "inspections"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Keuring bijwerken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Keuring bijgewerkt - Status 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"plannedDate\": \"2026-04-01\",\r\n    \"status\": \"IN_PROGRESS\",\r\n    \"carId\": {{dataCarId}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/inspections/{{newCarId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "inspections",
+                "{{newCarId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Keuring verwijderen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Keuring verwijderd - Status 204\", function () { pm.response.to.have.status(204); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/inspections/{{newInspectionId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "inspections",
+                "{{newInspectionId}}"
               ]
             }
           },
@@ -863,9 +1210,14 @@
                   "    if (jsonData.length > 0) {",
                   "        pm.collectionVariables.set(\"deficiencyId\", jsonData[0].id);",
                   "    }",
-                  "}"
+                  "}",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"dataDeficiencyId\", jsonData[0].id);"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -964,9 +1316,14 @@
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData).to.have.property('id');",
                   "    pm.expect(jsonData.description).to.equal('Koplamp defect');",
-                  "});"
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"newDeficiencyId\", jsonData.id);"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -1002,6 +1359,103 @@
               "path": [
                 "api",
                 "deficiencies"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Tekortkoming bijwerken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Tekortkoming bijgewerkt - Status 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"inspectionId\": {{dataInspectionId}},\r\n    \"description\": \"Remmen versleten - bijgewerkt\",\r\n    \"estimatedCost\": 250.00,\r\n    \"safetyRisk\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/deficiencies/{{newDeficiencyId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "deficiencies",
+                "{{newDeficiencyId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Tekortkoming verwijderen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Tekortkoming verwijderd - Status 204\", function () { pm.response.to.have.status(204); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/deficiencies/{{newDeficiencyId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "deficiencies",
+                "{{newDeficiencyId}}"
               ]
             }
           },
@@ -1134,6 +1588,65 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "7. Autorisatie",
+      "item": [
+        {
+          "name": "POST Klant aanmaken als monteur",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Monteur krijgt 403 Forbidden\", function () {\r",
+                  "    pm.response.to.have.status(403);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{monteurToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstName\": \"Test\",\r\n    \"lastName\": \"Monteur\",\r\n    \"email\": \"test.monteur@email.nl\",\r\n    \"phoneNumber\": \"0612345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/customers",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "customers"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "auth": {
@@ -1199,6 +1712,26 @@
     },
     {
       "key": "deficiencyId",
+      "value": ""
+    },
+    {
+      "key": "monteurToken",
+      "value": ""
+    },
+    {
+      "key": "dataCarId",
+      "value": ""
+    },
+    {
+      "key": "dataDeficiencyId",
+      "value": ""
+    },
+    {
+      "key": "newDeficiencyId",
+      "value": ""
+    },
+    {
+      "key": "dataInspectionId",
       "value": ""
     }
   ]
