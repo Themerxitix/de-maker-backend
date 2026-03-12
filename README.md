@@ -39,10 +39,10 @@ API draait op: `http://localhost:8080`
  
 ## Authenticatie
 
-| Rol     | Username   | Password    |
-|---------|------------|-------------|
-| Admin   | `admin`    | `admin123`  |
-| Monteur | `monteur` | `admin123`|
+| Rol     | Username   | Password                     |
+|---------|------------|------------------------------|
+| Admin   | `admin`    | `zie Installatiehandleiding` |
+| Monteur | `monteur` | `zie Installatiehandleiding` |
 
 **Test credentials:** Zie Installatiehandleiding voor inloggegevens.
 
