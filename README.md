@@ -41,6 +41,10 @@ API draait op: `http://localhost:8080`
 
 **Test credentials:** Zie Installatiehandleiding voor inloggegevens.
 
+**Voor het testen:**
+admin: admin123,
+monteur: admin123
+
 ## Testen
 
 DeMaker Autogarage API.postman_collection_V5.json
